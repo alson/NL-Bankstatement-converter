@@ -24,11 +24,9 @@ with open('SC_user_data.properties', 'rb') as config_file:  # load the propertie
     configs.load(config_file)
 
 path = configs.get("FILE_PATH").data  # path where the csv files are saved
-archivepath = str(path + "/Archive")  # creates name and directory for archiving files
+archivepath = str(path + "/archive")  # creates name and directory for archiving files
 bunq_acc = [  # creating list with unique identifiers to distinguish between bunq accounts
-    configs.get("BUNQ_ACCOUNT1").data,
-    configs.get("BUNQ_ACCOUNT2").data,
-    configs.get("BUNQ_ACCOUNT3").data
+    v.data for k, v in configs.items() if k.startswith("BUNQ_ACCOUNT")
 ]
 
 
@@ -244,10 +242,11 @@ def asn():
         else:
             row.insert(0, "")
             row.insert(1, amount)
-        description = str(row[5] + " - " + row[19])  # creating description string
+        description = str(row[4] + " - " + row[5] + " - " + row[19])  # creating description string
         row.insert(2, description)  # inserting description
         row.insert(3, "")  # inserting empty volgnummer
-        del row[5:23]  # delete columns not needed
+        row.insert(6, row[18])
+        del row[7:]  # delete columns not needed
     filecreation()
 
 
@@ -394,7 +393,7 @@ def filecreation():
                          str(a.year) + str(a.month).zfill(2) + str(a.day).zfill(2) + "_" + str(a.hour).zfill(2) +
                          str(a.minute).zfill(2) + ".csv")
 
-    fields_output = ["Withdrawal", "Deposit", "Description", "Number", "Date"]
+    fields_output = ["Withdrawal", "Deposit", "Description", "Number", "Date", "Account", "Memo"]
 
     with open(filename_write, 'w') as csvfile:
         csvwriter = csv.writer(csvfile)  # creating a csv writer object
